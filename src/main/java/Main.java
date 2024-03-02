@@ -3,10 +3,9 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-
-        System.out.println("На скольких человек необходимо разделить счёт?");
-
+        ArrayList <Product> productList = new ArrayList<>();
         int amount;
+        System.out.println("На скольких человек необходимо разделить счёт?");
 
         while (true) {
             Scanner sc = new Scanner(System.in);
@@ -14,7 +13,6 @@ public class Main {
             if (sc.hasNextInt()) {
 
                 while (true) {
-
                     amount = sc.nextInt();
 
                     if (amount < 1) {
@@ -23,55 +21,53 @@ public class Main {
                         System.out.println("Деление счёта бессмыслено :)");
                     } else {
                         System.out.println("Введите наименование товара и стоимость товара в формате рубли.копейки, например 'Цезарь 250.70'. Для окончания подсчета введите 'Завершить'");
-
-                        Product newProduct = new Product();
                         Calculator newCalculator = new Calculator();
 
                         sc.nextLine();
 
                         while (true) {
-
+                            Product newProduct = new Product();
                             String userAnswer = sc.nextLine();
 
-                            if (userAnswer.equalsIgnoreCase("завершить") != true) {
+                            if (!userAnswer.equalsIgnoreCase("завершить")) {
+                                try {
+                                    String[] userAnswerArr = userAnswer.split(" ");
+                                    String price = userAnswerArr[userAnswerArr.length - 1];
+                                    String name = userAnswer.replaceAll(price, "");
 
-                                newProduct.addProductArray(userAnswer);
-                                String[] productName = userAnswer.split(" ");
-                                newCalculator.setAllProductPrice(newProduct.getProductPrice(productName));
-
-                                System.out.println("Товар успешно добавлен в список");
-                                System.out.println("Хотите добавить еще товар или завершить подсчёт? Для окончания подсчета введите 'Завершить'");
+                                    newProduct.setProductName(name);
+                                    newProduct.setProductPrice(price);
+                                    newCalculator.setAllProductPrice(newProduct.getProductPrice());
+                                    productList.add(newProduct);
+                                    System.out.println("Товар успешно добавлен в список");
+                                    System.out.println("Хотите добавить еще товар или завершить подсчёт? Для окончания подсчета введите 'Завершить'");
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Неверный формат цены. Повторите попытку");
+                                } catch (Exception e) {
+                                    System.out.println("Неверный формат товара");
+                                }
                             }
 
                             else {
                                 break;
                             }
                         }
+                        if (newCalculator.getAllProductPrice() != 0.00) {
+                            System.out.println("Добавленные товары:");
 
-                        System.out.println("Добавленные товары:");
+                            for (Product eachProduct: productList) {
+                                System.out.println(eachProduct.getProductInfo());
+                            }
 
-                        ArrayList <String> newProductList = new ArrayList<>(newProduct.getProductArray());
-
-                        for (String eachProduct: newProductList) {
-                            System.out.println(eachProduct);
+                            System.out.println("Сумма к оплате каждого гостя: " + newCalculator.getGuestBill(amount));
+                            break;
                         }
-
-                        System.out.println("Сумма к оплате каждого гостя: " + newCalculator.getGuestBill(amount));
-                        break;
                     }
                 }
-
-
-            }
-
-            else {
+                break;
+            } else {
                 System.out.println("Неправильный ввод. Введите корректное цифровое значение");
-
             }
         }
-
-
-
     }
-
 }
